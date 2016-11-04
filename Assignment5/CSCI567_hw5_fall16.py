@@ -72,8 +72,25 @@ def kernel_kmeans(data,k):
 			r[n]=c
 		print "new round"
 	return r
+
+
+def init_parameters(k):
+	pass
+def compute_gamma(data,theta):
+	pass
+def update_theta(data,gamma):
+	pass
+def Gaussian_Mixture(data,k):
+	theta=init_parameters(k)
+	for i in range(5):
+		gamma=compute_gamma(data,theta)
+		theta=update_theta(data,gamma)
 if __name__ == '__main__':
 	blob,circle=read_data()
+
+	'''
+	Kmeans
+	'''
 	# normalize()?#
 	fig=plt.figure()
 	colors=['r','g','b','c','m']
@@ -86,8 +103,16 @@ if __name__ == '__main__':
 			ax=fig.add_subplot(2,3,plot_index)
 			ax.scatter(dataset[:,0],dataset[:,1],color=plot_colors)
 	plt.show()
+	
+	'''
+		kernel K means 
+	'''
+
 	r=kernel_kmeans(circle,2)
 	plot_colors=[colors[i] for i in r]
 	plt.scatter(circle[:,0],circle[:,1],color=plot_colors)
 	plt.show()
 
+	'''
+		Guassian Mixture Model with EM algorithms
+	'''
