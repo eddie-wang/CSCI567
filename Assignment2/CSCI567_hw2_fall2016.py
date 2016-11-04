@@ -24,11 +24,13 @@ def split_data(boston):
 			Data(data=np.array(test_data_data),target=np.array(test_data_target))
 
 def data_plot(train_data):
-	for i in range(12):
+	for i in range(13):
+		ax = fig.add_subplot(5,3,i+1)
 		data=train_data.data.T[i]
-		b=list(np.arange(data.min(),data.max(),(data.max()-data.min())/10))
-		plt.hist(data,bins=10)
-		plt.show()
+		# b=list(np.arange(data.min(),data.max(),(data.max()-data.min())/10))
+
+		ax.hist(data,bins=10)
+	plt.show()
 
 def pearson_correlation(X,Y):
 	meanX,meanY=X.mean(),Y.mean()
@@ -158,14 +160,16 @@ class RidgeRegression:
 			print "when lambda = " , _lambda,  "CV result is " , mse.mean(), "the mse for test set is ",RidgeRegression(self.train_data,_lambda,self.test_data).test(self.test_data)	
 
 if __name__ == '__main__':
-	boston = load_boston()
-	train_data,test_data=split_data(boston)
-	data_plot(train_data) #plot data#
-
+	
 	'''
 		3.1 
 	'''
+	boston = load_boston()
+	train_data,test_data=split_data(boston)
+	data_plot(train_data) #plot data#
 	standardize(train_data,test_data) #standardize data#
+	for attribute_id , attribute in enumerate(train_data.data.T):	
+		print "attribute #" ,attribute_id ,"'s pearson_correlation is",pearson_correlation(attribute,train_data.target)
 	'''
 		3.2 Linear regression
 	'''
@@ -195,7 +199,7 @@ if __name__ == '__main__':
 	linear_regression=LinearRegression(select_features(train_data,features))
 	train_result=linear_regression.test(select_features(train_data,features))
 	test_result=linear_regression.test(select_features(test_data,features))
-	print "3.3 Selection with Correlation (a) :  four selected features is ",features , "the mse for training set is ",train_result," for testing set is ",test_result
+	print "3.3 Selection with Correlation (a) :  Four selected features is ",features , " MSE for training set is ",train_result," MSE for testing set is ",test_result
 	'''
 	(b)
 	'''
@@ -208,7 +212,7 @@ if __name__ == '__main__':
 		linear_regression=LinearRegression(select_features (train_data,features))
 		predicted=linear_regression.predict(select_features(train_data,features)) #asfas#
 		linear_regression=LinearRegression(select_features (train_data,features))	
-	print "3.3 Selection with Correlation (b):  four selected features is ",features , "training result is ",linear_regression.test(select_features(train_data,features)),"testing result is ",linear_regression.test(select_features(test_data,features))	
+	print "3.3 Selection with Correlation (b):  Four selected features is ",features , " MSE for training set is ",linear_regression.test(select_features(train_data,features))," MSE for testing set is ",linear_regression.test(select_features(test_data,features))	
 
 	'''
 	Selection with Brute-force Search
@@ -220,8 +224,8 @@ if __name__ == '__main__':
 		train_result=linear_regression.test(select_features(train_data,features))
 		test_result=linear_regression.test(select_features(test_data,features))
 		if train_result<best_train_result:
-			best_train_result,best_features,best_test_result=train_result,features,test_result
-	print "3.3 Selecting with Brute-force search, the best combination features is ",best_features ,"mse for train is ", best_train_result ,"mse for test is",best_test_result
+			best_train_result,best_features,best_test_result=train_result,features,test_result 
+	print "3.3 Selecting with Brute-force search, the best combination features is ",best_features ," MSE for training set is ", best_train_result ," MSE for testing set is",best_test_result
 
 
 	'''
@@ -233,4 +237,4 @@ if __name__ == '__main__':
 	linear_regression=LinearRegression(new_train_data)
 	train_result=linear_regression.test(new_train_data)
 	test_result=linear_regression.test(new_test_data)	
-	print train_result,test_result
+	print "3.4 Polynomial feature Expansion: MSE for training set is ",train_result,"MSE for testing set is" ,test_result
