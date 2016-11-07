@@ -73,18 +73,56 @@ def kernel_kmeans(data,k):
 		print "new round"
 	return r
 
+def gaussian(mu,sigma,x):
+	'''
+		two dimensional gaussion ditribution
+		all parameter need to be numpy array type
+	'''
+	return math.exp(-0.5* ((x-mu).T).dot(np.linalg.inv(sigma)).dot(x-mu) )/math.sqrt(((2*math.pi)**2)* np.linalg.det(sigma))
 
-def init_parameters(k):
-	pass
+def init_parameters(data,k):
+	r=kmeans(data,k)
+	d=[[],[],[]]
+	for i in range(len(r)):
+		d[r[i]].append(data[i])
+	return {"mu":[np.array(d[0]).mean(axis=0),np.array(d[1]).mean(axis=0),np.array(d[2]).mean(axis=0)]  , "sigma":[np.cov(np.array(d[0]).T),np.cov(np.array(d[1]).T),np.cov(np.array(d[2]).T)], "w":[len(d[0]),len(d[1]),len(d[2])]}
+
 def compute_gamma(data,theta):
-	pass
+	gamma=[0]*len(data)
+	for n in range(len(data)):
+		x_given_z = [ theta["w"][i]*gaussian(theta["mu"][i],theta["sigma"][i],data[n]) for i in range(len(theta["mu"]))]
+		s=sum(x_given_z)
+		gamma[n]=np.array(x_given_z)/s
+	return np.asarray(gamma)
 def update_theta(data,gamma):
-	pass
+	w=gamma.sum(axis=0)/gamma.sum()
+	mu= [(gamma[:,k:k+1]*data).sum(axis=0)/gamma[:,k].sum(axis=0)  for k in range(len(gamma[0])) ]
+	sigma= [(gamma[:,k:k+1]*(data-mu[k])).T.dot(data-mu[k]) / gamma[:,k].sum(axis=0) for k in range(len(gamma[0]))]
+	return {"mu":mu,"sigma":sigma,"w":w}
+
+def log_likelihood(data,theta):
+	result=0.0
+	for d in data:
+		result+=math.log(sum([  theta["w"][i]*gaussian(theta["mu"][i],theta["sigma"][i],d)  for i  in range(2)]))
+	return result	
 def Gaussian_Mixture(data,k):
-	theta=init_parameters(k)
+	'''
+	theta=[{"mu": ,"sigma"=,"w"=  }]
+	gamma=[] n*k
+	'''
+	values=[]
+	theta=init_parameters(data,k)
+	print theta
 	for i in range(5):
 		gamma=compute_gamma(data,theta)
 		theta=update_theta(data,gamma)
+		values.append(log_likelihood(data,theta))
+	plt.plot(range(5), values, '-o')
+	plt.show()
+	r=gamma.argmax(axis=1)
+	colors=["r","g","b"]
+	plt.scatter(data[:,0],data[:,1],color=[ colors[i] for i in r] )
+	plt.show()
 if __name__ == '__main__':
 	blob,circle=read_data()
 
@@ -116,3 +154,4 @@ if __name__ == '__main__':
 	'''
 		Guassian Mixture Model with EM algorithms
 	'''
+	Gaussian_Mixture(blob,3)
